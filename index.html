@@ -230,7 +230,7 @@
   <header class="hero">
     <div class="hero-top"><span class="live-pill"><span class="dot"></span>实时巡检中 · 20 秒刷新</span><span class="hero-note">X · 微博 · 小红书 · 抖音 · LINUX DO · 微信</span></div>
     <h1>小豆邀请码抓码站</h1>
-    <p class="lede">社区收集的豆包小豆邀请码，不只盯 X —— 微博、LINUX DO 等平台的公开分享也一并收录，每个码都标清来源平台和原帖，并先过一遍 6 位格式检查，不合格的会标出来。这不是豆包或字节跳动的官方页面。<strong>一码只能用一次，越新越有机会，请尽快尝试。</strong></p>
+    <p class="lede">社区收集的豆包小豆邀请码，不只盯 X —— 微博、LINUX DO 等平台的公开分享也一并收录，每个码都标清来源平台和原帖，并先过一遍格式检查：必须是 6 位、字母和数字都有，全字母、全数字、5 位、OPENAI 这类英文词直接不显示。这不是豆包或字节跳动的官方页面。<strong>一码只能用一次，越新越有机会，请尽快尝试。</strong></p>
   </header>
 
   <dl class="meta">
@@ -257,7 +257,7 @@
 
   <section aria-label="邀请码列表">
     <h2 style="margin-top:8px">邀请码</h2>
-    <p class="hint">新码在上，15 分钟内发出的会标「实时新码」并排在最前。小豆邀请码应为 6 位字母数字，本站对每个码自动做格式检查：位数或字符不对的标「格式异常」，不计入可用数、也不会被推荐。点「我试过了」只记在本次打开期间，方便你接着试下一个，不会改写巡检状态。</p>
+    <p class="hint">新码在上，15 分钟内发出的会标「实时新码」并排在最前。小豆邀请码必须是 6 位字母数字、且字母和数字都有，全字母、全数字、5 位、OPENAI / CLOUD 这类英文词本站直接不收录、不显示。点「我试过了」只记在本次打开期间，方便你接着试下一个，不会改写巡检状态。</p>
 
     <div class="checkbar">
       <input type="text" id="checkInput" placeholder="粘贴一个码，先验格式再用" aria-label="手动检查邀请码格式" maxlength="24" autocomplete="off" spellcheck="false">
@@ -397,20 +397,31 @@ function ageMin(item){if(!item.postedAtUtc)return null;var t=Date.parse(item.pos
 function ageText(item){var m=ageMin(item);if(m===null)return "";if(m<1)return "刚刚";if(m<60)return m+" 分钟前";var h=Math.floor(m/60);if(h<24)return h+" 小时前";return Math.floor(h/24)+" 天前";}
 function isFresh(item){var m=ageMin(item);return m!==null&&m<=15;}
 
-/* 格式检查：小豆邀请码应为 6 位字母数字 */
+/* 格式检查：小豆邀请码必须是 6 位字母数字，且字母和数字都有。
+   全字母（如 OPENAI、CLOUD）、全数字、5 位等一律不算码，直接不显示。 */
+var BAD_WORDS=["OPENAI","CLOUD","DOUBAO","XIAODOU","CHATGPT","CLAUDE","GEMINI","GOOGLE","NVIDIA","AMAZON","MICROSOFT","ALIBABA","TENCENT","BYTEDANCE","COPILOT","DEEPSEEK","KIMIAI","QWENAI","DOUYIN","WECHAT","BAIDU"]; /* 品牌词 / 常见英文词：哪怕以后带数字混进来也直接不收 */
 function validateCode(raw){
   var code=String(raw==null?"":raw).trim().toUpperCase();
   if(!code)return {ok:false,code:code,reason:"空的，没有内容"};
   if(/^M-[A-Z0-9]+$/.test(code))return {ok:false,link:true,code:code,reason:"这是官方邀请链接里的码（M- 开头），不是 6 位邀请码"};
   if(code.length!==6)return {ok:false,code:code,reason:"共 "+code.length+" 位，小豆邀请码应为 6 位"};
   if(!/^[A-Z0-9]{6}$/.test(code))return {ok:false,code:code,reason:"含字母和数字以外的字符"};
-  return {ok:true,code:code,reason:"格式正确：6 位字母数字"};
+  if(!/[A-Z]/.test(code))return {ok:false,code:code,reason:"全是数字，没有字母"};
+  if(!/[0-9]/.test(code))return {ok:false,code:code,reason:"全是字母，没有数字，可能是英文单词（如 OPENAI），不是邀请码"};
+  if(BAD_WORDS.indexOf(code)!==-1)return {ok:false,code:code,reason:"是常见英文词，不是邀请码"};
+  return {ok:true,code:code,reason:"格式正确：6 位字母数字，且字母和数字都有"};
 }
 function mergeCodes(xCodes){
   var seen={}, out=[];
-  (xCodes||[]).forEach(function(c){var item={code:c.code,platform:"X",author:c.author,postUrl:c.postUrl,postedAt:c.postedAt,postedAtUtc:c.postedAtUtc,replyCount:c.replyCount,status:c.status,expires:c.expires,officialUrl:c.officialUrl};seen[item.code]=1;out.push(item);});
-  EXTRA_CODES.forEach(function(c){if(!seen[c.code]){out.push(c);seen[c.code]=1;}});
-  out.forEach(function(it){it.check=validateCode(it.code);});
+  function add(c, platform){
+    var item={code:c.code,platform:platform||"X",author:c.author,postUrl:c.postUrl,postedAt:c.postedAt,postedAtUtc:c.postedAtUtc,replyCount:c.replyCount,status:c.status,expires:c.expires,officialUrl:c.officialUrl};
+    if(seen[item.code])return;
+    item.check=validateCode(item.code);
+    if(!item.check.ok)return; /* 格式不合的直接不编入网站、不显示 */
+    seen[item.code]=1;out.push(item);
+  }
+  (xCodes||[]).forEach(function(c){add(c,"X");});
+  EXTRA_CODES.forEach(function(c){add(c,c.platform);});
   return out;
 }
 function counts(){
@@ -434,7 +445,6 @@ function filtered(){
   var out=allCodes.filter(function(it){
     if(platFilter!=="all"&&it.platform!==platFilter)return false;
     if(statusFilter==="tried"){if(!tried[it.code])return false;}
-    else if(statusFilter==="invalid"){if(it.check&&it.check.ok)return false;}
     else if(statusFilter!=="all"){if(it.status!==statusFilter)return false;if(it.check&&!it.check.ok)return false;}
     if(availOnly&&!(it.status==="maybe_available"&&it.check&&it.check.ok))return false;
     if(freshOnly&&!isFresh(it))return false;
@@ -458,7 +468,7 @@ function renderFilters(){
   document.getElementById("platFilters").innerHTML='<span class="group-label">平台</span>'+platOpts.map(function(o){
     return '<button type="button" class="pillbtn" data-plat="'+esc(o[0])+'" aria-pressed="'+(platFilter===o[0])+'">'+esc(o[1])+' '+o[2]+'</button>';
   }).join("");
-  var stOpts=[["all","全部",c.all],["maybe_available","可能可用",c.maybe_available],["maybe_used","可能已用",c.maybe_used],["confirmed_used","已确认被用",c.confirmed_used],["invalid","格式异常",c.invalid],["tried","我试过了",c.tried]];
+  var stOpts=[["all","全部",c.all],["maybe_available","可能可用",c.maybe_available],["maybe_used","可能已用",c.maybe_used],["confirmed_used","已确认被用",c.confirmed_used],["tried","我试过了",c.tried]];
   document.getElementById("statusFilters").innerHTML='<span class="group-label">状态</span>'+stOpts.map(function(o){
     return '<button type="button" class="pillbtn" data-status="'+esc(o[0])+'" aria-pressed="'+(statusFilter===o[0])+'">'+esc(o[1])+' '+o[2]+'</button>';
   }).join("");
@@ -491,7 +501,7 @@ function render(){
   updateFilterCount();
   var c=counts();
   document.getElementById("lastUpdated").textContent=lastUpdatedText||"—";
-  document.getElementById("summary").textContent=c.all+" 个码，其中可能可用 "+c.maybe_available+" 个 · 15 分钟内新码 "+c.fresh+" 个"+(c.invalid?" · 格式异常 "+c.invalid+" 个已排除":"");
+  document.getElementById("summary").textContent=c.all+" 个码，其中可能可用 "+c.maybe_available+" 个 · 15 分钟内新码 "+c.fresh+" 个";
   document.getElementById("wCount").textContent="可能可用 "+c.maybe_available+" 个 · 共 "+c.all+" 个码";
   document.getElementById("wTime").textContent="快照 "+(lastUpdatedText||"");
   var spot=nextAvailable(null);
@@ -600,7 +610,7 @@ function runCheck(){
   if(r.ok){
     var found=null;
     allCodes.forEach(function(it){if(it.code.toUpperCase()===r.code)found=it;});
-    el.textContent="✓ "+r.code+" 格式正确（6 位字母数字）。"+(found?("本站已收录："+(STATUS_LABEL[found.status]||found.status)+" · 来自 "+found.platform+" "+(found.platform==="X"?"@":"")+found.author+"，"+found.postedAt+"。"):"本站暂未收录这个码，可以直接去小豆 App 里试。");
+    el.textContent="✓ "+r.code+" 格式正确（6 位字母数字，字母和数字都有）。"+(found?("本站已收录："+(STATUS_LABEL[found.status]||found.status)+" · 来自 "+found.platform+" "+(found.platform==="X"?"@":"")+found.author+"，"+found.postedAt+"。"):"本站暂未收录这个码，可以直接去小豆 App 里试。");
     el.className="check-result show ok";
   }else{
     el.textContent="✗ "+(r.code||"（空）")+" 未通过检查："+r.reason+"。这种码在小豆里多半用不了，先回原帖核对有没有抄漏字符。";
