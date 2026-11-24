@@ -257,7 +257,7 @@
 
   <section aria-label="邀请码列表">
     <h2 style="margin-top:8px">邀请码</h2>
-    <p class="hint">新码在上，15 分钟内发出的会标「实时新码」并排在最前。小豆邀请码必须是 6 位字母数字、且字母和数字都有，全字母、全数字、5 位、OPENAI / CLOUD 这类英文词本站直接不收录、不显示；3 个字母连在一起、或 3 个数字连在一起的也直接不收。点「我试过了」只记在本次打开期间，方便你接着试下一个，不会改写巡检状态。</p>
+    <p class="hint">新码在上，15 分钟内发出的会标「实时新码」并排在最前。小豆邀请码必须是 6 位字母数字、且字母和数字都有，全字母、全数字、5 位、OPENAI / CLOUD 这类英文词本站直接不收录、不显示；3 个字母连在一起、或 3 个数字连在一起的也直接不收；含骂人谐音数字 91、78、13、27 的也直接不收。点「我试过了」只记在本次打开期间，方便你接着试下一个，不会改写巡检状态。</p>
 
     <div class="checkbar">
       <input type="text" id="checkInput" placeholder="粘贴一个码，先验格式再用" aria-label="手动检查邀请码格式" maxlength="24" autocomplete="off" spellcheck="false">
@@ -382,6 +382,8 @@ function isFresh(item){var m=ageMin(item);return m!==null&&m<=15;}
    全字母（如 OPENAI、CLOUD）、全数字、5 位等一律不算码，直接不显示。 */
 var BAD_WORDS=["OPENAI","CLOUD","DOUBAO","XIAODOU","CHATGPT","CLAUDE","GEMINI","GOOGLE","NVIDIA","AMAZON","MICROSOFT","ALIBABA","TENCENT","BYTEDANCE","COPILOT","DEEPSEEK","KIMIAI","QWENAI","DOUYIN","WECHAT","BAIDU","ABC123","123ABC","QWERTY","ASDFGH","ZXCVBN","AAAAAA","111111","000000","123456","ABCDEF"]; /* 品牌词 / 常见英文词 / 占位码：直接不收 */
 var BAD_STEMS=["OPENAI","GOOGLE","NVIDIA","DOUBAO","XIAODOU","CHATGPT","CLAUDE","GEMINI","CLOUD","OPEN","GOOG","NVDA","TESLA","APPLE","META"];
+var BAD_NUMBER_PAIRS=["91","78","13","27"]; /* 骂人谐音数字：91、78、13、27，含其中任意一对就踢 */
+var BAD_INSULTS=["JB","SB","CNM","NMSL","TMD"];
 function validateCode(raw){
   var code=String(raw==null?"":raw).trim().toUpperCase();
   if(!code)return {ok:false,code:code,reason:"空的，没有内容"};
@@ -402,6 +404,8 @@ function validateCode(raw){
   var lettersOnly=code.replace(/[0-9]/g,"");
   if(BAD_WORDS.indexOf(lettersOnly)!==-1)return {ok:false,code:code,reason:"去掉数字后是品牌词 / 英文词，不是邀请码"};
   for(var i=0;i<BAD_STEMS.length;i++){if(code.indexOf(BAD_STEMS[i])!==-1)return {ok:false,code:code,reason:"含有品牌词 "+BAD_STEMS[i]+"，不是邀请码"};}
+  for(var j=0;j<BAD_NUMBER_PAIRS.length;j++){if(code.indexOf(BAD_NUMBER_PAIRS[j])!==-1)return {ok:false,code:code,reason:"含骂人谐音数字 "+BAD_NUMBER_PAIRS[j]};}
+  for(var k=0;k<BAD_INSULTS.length;k++){if(code.indexOf(BAD_INSULTS[k])!==-1)return {ok:false,code:code,reason:"含骂人缩写 "+BAD_INSULTS[k]};}
   return {ok:true,code:code,reason:"格式正确：6 位字母数字，且字母和数字都有"};
 }
 function mergeCodes(xCodes){
