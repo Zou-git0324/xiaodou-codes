@@ -222,7 +222,7 @@
 <section id="widget" aria-label="小豆邀请码小组件">
   <div class="w-label">● 最新可能可用 · 小豆邀请码</div>
   <div class="w-code" id="wCode">MJ7891</div>
-  <div class="w-count" id="wCount">可能可用 6 个 · 共 28 个码</div>
+  <div class="w-count" id="wCount">可能可用 6 个 · 共 21 个码</div>
   <div class="w-label" id="wTime">快照 2026-11-24 19:02 北京时间</div>
 </section>
 
@@ -237,7 +237,7 @@
     <div><dt>最后更新（数据源）</dt><dd id="lastUpdated">2026-11-24 19:02 北京时间</dd></div>
     <div><dt>巡检 · 本页刷新</dt><dd>原站数据约每 5 分钟写入<br><small>本页每 20 秒自动拉取一次（原站是 60 秒）</small></dd></div>
     <div><dt>下次刷新</dt><dd><span id="countdown">20</span> 秒 <button type="button" class="btn quiet" id="refreshNow" style="min-height:36px;padding:4px 10px;margin-left:6px">立即刷新</button></dd></div>
-    <div><dt>当前收录</dt><dd id="summary">28 个码，其中可能可用 6 个</dd></div>
+    <div><dt>当前收录</dt><dd id="summary">21 个码，其中可能可用 6 个</dd></div>
   </dl>
 
   <div id="newAlert" role="status"></div>
@@ -358,7 +358,6 @@ var EXTRA_CODES = [
 var SNAPSHOT = {"lastUpdated":"2026-11-24 19:02 北京时间","codes":[
 {"code":"MJ7891","author":"wanluo01","postUrl":"https://x.com/wanluo01/status/2125183330593517587","postedAt":"2026-11-24 19:02:44 北京时间","postedAtUtc":"2026-11-24T11:02:44.000Z","replyCount":0,"status":"maybe_available"},
 {"code":"FG83KC","author":"tsaielio","postUrl":"https://x.com/tsaielio/status/2125176786560676175","postedAt":"2026-11-24 18:36:44 北京时间","postedAtUtc":"2026-11-24T10:36:44.000Z","replyCount":0,"status":"maybe_available","expires":"2026-11-26 18:35"},
-{"code":"KFCDD","author":"kuritian24","postUrl":"https://x.com/kuritian24/status/2125174734153470047","postedAt":"2026-11-24 18:28:35 北京时间","postedAtUtc":"2026-11-24T10:28:35.000Z","replyCount":3,"status":"maybe_used"},
 {"code":"UGM4F5","author":"JingyiWang2001","postUrl":"https://x.com/JingyiWang2001/status/2125173943552372772","postedAt":"2026-11-24 18:25:26 北京时间","postedAtUtc":"2026-11-24T10:25:26.000Z","replyCount":0,"status":"maybe_available"},
 {"code":"UH7SA9","author":"IderSp27732","postUrl":"https://x.com/IderSp27732/status/2125167573172146429","postedAt":"2026-11-24 18:00:07 北京时间","postedAtUtc":"2026-11-24T10:00:07.000Z","replyCount":0,"status":"maybe_available"},
 {"code":"NDR7S3","author":"chen2693509339","postUrl":"https://x.com/chen2693509339/status/2125167370385887398","postedAt":"2026-11-24 17:59:19 北京时间","postedAtUtc":"2026-11-24T09:59:19.000Z","replyCount":0,"status":"maybe_available","expires":"2026-11-26 17:56"},
@@ -376,10 +375,8 @@ var SNAPSHOT = {"lastUpdated":"2026-11-24 19:02 北京时间","codes":[
 {"code":"NCRBZX","author":"wangbanxian","postUrl":"https://x.com/wangbanxian/status/2125145304576192689","postedAt":"2026-11-24 16:31:38 北京时间","postedAtUtc":"2026-11-24T08:31:38.000Z","replyCount":4,"status":"maybe_used","expires":"2026-11-26 10:49"},
 {"code":"ZH3ZJK","author":"robin729","postUrl":"https://x.com/robin729/status/2125143175681749254","postedAt":"2026-11-24 16:23:10 北京时间","postedAtUtc":"2026-11-24T08:23:10.000Z","replyCount":3,"status":"maybe_used"},
 {"code":"YXCVQ7","author":"Koala329422","postUrl":"https://x.com/Koala329422/status/2125142749016137958","postedAt":"2026-11-24 16:21:29 北京时间","postedAtUtc":"2026-11-24T08:21:29.000Z","replyCount":1,"status":"maybe_used"},
-{"code":"M-342WXG","author":"GH_Seauro","postUrl":"https://x.com/GH_Seauro/status/2125142511115190395","postedAt":"2026-11-24 16:20:32 北京时间","postedAtUtc":"2026-11-24T08:20:32.000Z","replyCount":1,"status":"maybe_used","officialUrl":"https://activity.doubao.com/ug/invite-share/M-342WXG"},
 {"code":"L4TT9C","author":"windsolo1","postUrl":"https://x.com/windsolo1/status/2125142292248100960","postedAt":"2026-11-24 16:19:40 北京时间","postedAtUtc":"2026-11-24T08:19:40.000Z","replyCount":0,"status":"confirmed_used","expires":"2026-11-26 11:27"},
 {"code":"KFCV50","author":"huzhouagi","postUrl":"https://x.com/huzhouagi/status/2125141745805791561","postedAt":"2026-11-24 16:17:30 北京时间","postedAtUtc":"2026-11-24T08:17:30.000Z","replyCount":0,"status":"maybe_available"},
-{"code":"KSKBL","author":"rmafr10","postUrl":"https://x.com/rmafr10/status/2125141012570087692","postedAt":"2026-11-24 16:14:35 北京时间","postedAtUtc":"2026-11-24T08:14:35.000Z","replyCount":4,"status":"maybe_used"}
 ]};
 
 var allCodes = [];
@@ -399,7 +396,8 @@ function isFresh(item){var m=ageMin(item);return m!==null&&m<=15;}
 
 /* 格式检查：小豆邀请码必须是 6 位字母数字，且字母和数字都有。
    全字母（如 OPENAI、CLOUD）、全数字、5 位等一律不算码，直接不显示。 */
-var BAD_WORDS=["OPENAI","CLOUD","DOUBAO","XIAODOU","CHATGPT","CLAUDE","GEMINI","GOOGLE","NVIDIA","AMAZON","MICROSOFT","ALIBABA","TENCENT","BYTEDANCE","COPILOT","DEEPSEEK","KIMIAI","QWENAI","DOUYIN","WECHAT","BAIDU"]; /* 品牌词 / 常见英文词：哪怕以后带数字混进来也直接不收 */
+var BAD_WORDS=["OPENAI","CLOUD","DOUBAO","XIAODOU","CHATGPT","CLAUDE","GEMINI","GOOGLE","NVIDIA","AMAZON","MICROSOFT","ALIBABA","TENCENT","BYTEDANCE","COPILOT","DEEPSEEK","KIMIAI","QWENAI","DOUYIN","WECHAT","BAIDU","ABC123","123ABC","QWERTY","ASDFGH","ZXCVBN","AAAAAA","111111","000000","123456","ABCDEF"]; /* 品牌词 / 常见英文词 / 占位码：直接不收 */
+var BAD_STEMS=["OPENAI","GOOGLE","NVIDIA","DOUBAO","XIAODOU","CHATGPT","CLAUDE","GEMINI","CLOUD","OPEN","GOOG","NVDA","TESLA","APPLE","META"];
 function validateCode(raw){
   var code=String(raw==null?"":raw).trim().toUpperCase();
   if(!code)return {ok:false,code:code,reason:"空的，没有内容"};
@@ -408,7 +406,10 @@ function validateCode(raw){
   if(!/^[A-Z0-9]{6}$/.test(code))return {ok:false,code:code,reason:"含字母和数字以外的字符"};
   if(!/[A-Z]/.test(code))return {ok:false,code:code,reason:"全是数字，没有字母"};
   if(!/[0-9]/.test(code))return {ok:false,code:code,reason:"全是字母，没有数字，可能是英文单词（如 OPENAI），不是邀请码"};
-  if(BAD_WORDS.indexOf(code)!==-1)return {ok:false,code:code,reason:"是常见英文词，不是邀请码"};
+  if(BAD_WORDS.indexOf(code)!==-1)return {ok:false,code:code,reason:"是常见英文词 / 品牌词 / 占位码，不是邀请码"};
+  var lettersOnly=code.replace(/[0-9]/g,"");
+  if(BAD_WORDS.indexOf(lettersOnly)!==-1)return {ok:false,code:code,reason:"去掉数字后是品牌词 / 英文词，不是邀请码"};
+  for(var i=0;i<BAD_STEMS.length;i++){if(code.indexOf(BAD_STEMS[i])!==-1)return {ok:false,code:code,reason:"含有品牌词 "+BAD_STEMS[i]+"，不是邀请码"};}
   return {ok:true,code:code,reason:"格式正确：6 位字母数字，且字母和数字都有"};
 }
 function mergeCodes(xCodes){
@@ -443,6 +444,7 @@ function filtered(){
   var availOnly=document.getElementById("availOnly").checked;
   var sort=document.getElementById("sortSel").value;
   var out=allCodes.filter(function(it){
+    if(!it.check||!it.check.ok)return false; /* 第二道防线：不合规的在这里也直接剔除，绝不进页面 */
     if(platFilter!=="all"&&it.platform!==platFilter)return false;
     if(statusFilter==="tried"){if(!tried[it.code])return false;}
     else if(statusFilter!=="all"){if(it.status!==statusFilter)return false;if(it.check&&!it.check.ok)return false;}
