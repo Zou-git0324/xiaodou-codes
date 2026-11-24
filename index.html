@@ -257,7 +257,7 @@
 
   <section aria-label="邀请码列表">
     <h2 style="margin-top:8px">邀请码</h2>
-    <p class="hint">新码在上，15 分钟内发出的会标「实时新码」并排在最前。小豆邀请码必须是 6 位字母数字、且字母和数字都有，全字母、全数字、5 位、OPENAI / CLOUD 这类英文词本站直接不收录、不显示；3 个字母连在一起、或 3 个数字连在一起的也直接不收；含骂人谐音数字 91、78、13、27 的也直接不收。点「我试过了」只记在本次打开期间，方便你接着试下一个，不会改写巡检状态。</p>
+    <p class="hint">新码在上，15 分钟内发出的会标「实时新码」并排在最前。小豆邀请码必须是 6 位字母数字、且字母和数字都有，全字母、全数字、5 位、OPENAI / CLOUD 这类英文词本站直接不收录、不显示；3 个字母连在一起、或 3 个数字连在一起的也直接不收；含骂人谐音数字 91、78、13、27 的也直接不收。已用怎么看：豆包没有官方核查接口，原站按原帖回复数推断——回复 0 是可能可用，有回复就是已使用。已使用的码只显示一次，下次更新就踢掉；重复出现的码不再当新码报。点「我试过了」会记在本机，下次更新也踢掉。</p>
 
     <div class="checkbar">
       <input type="text" id="checkInput" placeholder="粘贴一个码，先验格式再用" aria-label="手动检查邀请码格式" maxlength="24" autocomplete="off" spellcheck="false">
@@ -342,8 +342,11 @@
 
 <script>
 var DATA_URL = "https://good1uck.github.io/xiaodou-codes/codes.json";
-var STATUS_LABEL = {maybe_available:"可能可用", maybe_used:"可能已用", confirmed_used:"已确认被用"};
-var STATUS_CLASS = {maybe_available:"ok", maybe_used:"warn", confirmed_used:"bad"};
+var STATUS_LABEL = {maybe_available:"可能可用", maybe_used:"已使用", confirmed_used:"已使用"};
+var STATUS_CLASS = {maybe_available:"ok", maybe_used:"bad", confirmed_used:"bad"};
+/* 已用怎么看：豆包没有官方核查接口，原站是按原帖回复数推断的——回复 0 = 可能可用，回复 >0 = 已使用，人工核对过的 = 已使用。
+   所以“已使用”是推断，不是 100% 准。显示一次后，下次更新就踢掉。 */
+function isUsedItem(it){return it.status!=="maybe_available"||(it.replyCount!=null&&it.replyCount>0);}
 var PLATFORMS = ["all","X","微博","小红书","抖音","LINUX DO","微信","其他"];
 
 /* 人工补入的多平台码（原站没有）：状态均为已确认被用 */
@@ -366,7 +369,11 @@ var SNAPSHOT = {"lastUpdated":"2026-11-24 19:02 北京时间","codes":[
 var allCodes = [];
 var lastUpdatedText = SNAPSHOT.lastUpdated;
 var platFilter = "all", statusFilter = "all";
-var tried = {}; /* 仅本次打开期间有效 */
+function lsGet(k){try{return JSON.parse(localStorage.getItem(k)||"{}");}catch(e){return {};}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+var tried = lsGet("xiaodou-tried-v1"); /* 点过“我试过了”的码，存在本机，下次更新踢掉 */
+var usedShown = lsGet("xiaodou-used-shown-v1"); /* 已使用码第一次显示的时间，下次更新（20 秒后）踢掉 */
+var seenCodes = lsGet("xiaodou-seen-v1"); /* 见过的码，重复出现不再当新码报、不重复加入 */
 var copiedCode = null;
 var knownAvail = {};
 var countdown = 20;
@@ -411,14 +418,27 @@ function validateCode(raw){
 function mergeCodes(xCodes){
   var seen={}, out=[];
   function add(c, platform){
-    var item={code:c.code,platform:platform||"X",author:c.author,postUrl:c.postUrl,postedAt:c.postedAt,postedAtUtc:c.postedAtUtc,replyCount:c.replyCount,status:c.status,expires:c.expires,officialUrl:c.officialUrl};
-    if(seen[item.code])return;
+    var code=String(c.code==null?"":c.code).trim().toUpperCase();
+    if(!code)return;
+    if(seen[code])return; /* 同一次数据里重复的码，只留第一次出现的那条，不重复加入 */
+    seen[code]=1;
+    var item={code:code,platform:platform||"X",author:c.author,postUrl:c.postUrl,postedAt:c.postedAt,postedAtUtc:c.postedAtUtc,replyCount:c.replyCount,status:c.status,expires:c.expires,officialUrl:c.officialUrl};
     item.check=validateCode(item.code);
     if(!item.check.ok)return; /* 格式不合的直接不编入网站、不显示 */
-    seen[item.code]=1;out.push(item);
+    if(tried[code])return; /* 点过“我试过了”的，下次更新直接踢掉 */
+    if(isUsedItem(item)){
+      var firstShown=usedShown[code];
+      if(firstShown&&Date.now()-firstShown>20000)return; /* 已使用显示过一次了，下次更新踢掉 */
+      if(!firstShown){usedShown[code]=Date.now();lsSet("xiaodou-used-shown-v1",usedShown);}
+      item.status="confirmed_used"; /* 统一显示为“已使用” */
+    }else{
+      seenCodes[code]=1;
+    }
+    out.push(item);
   }
   (xCodes||[]).forEach(function(c){add(c,"X");});
   EXTRA_CODES.forEach(function(c){add(c,c.platform);});
+  lsSet("xiaodou-seen-v1",seenCodes);
   return out;
 }
 function counts(){
@@ -443,6 +463,7 @@ function filtered(){
     if(!it.check||!it.check.ok)return false; /* 第二道防线：不合规的在这里也直接剔除，绝不进页面 */
     if(platFilter!=="all"&&it.platform!==platFilter)return false;
     if(statusFilter==="tried"){if(!tried[it.code])return false;}
+    else if(statusFilter==="used"){if(!isUsedItem(it))return false;}
     else if(statusFilter!=="all"){if(it.status!==statusFilter)return false;if(it.check&&!it.check.ok)return false;}
     if(availOnly&&!(it.status==="maybe_available"&&it.check&&it.check.ok))return false;
     if(freshOnly&&!isFresh(it))return false;
@@ -466,7 +487,7 @@ function renderFilters(){
   document.getElementById("platFilters").innerHTML='<span class="group-label">平台</span>'+platOpts.map(function(o){
     return '<button type="button" class="pillbtn" data-plat="'+esc(o[0])+'" aria-pressed="'+(platFilter===o[0])+'">'+esc(o[1])+' '+o[2]+'</button>';
   }).join("");
-  var stOpts=[["all","全部",c.all],["maybe_available","可能可用",c.maybe_available],["maybe_used","可能已用",c.maybe_used],["confirmed_used","已确认被用",c.confirmed_used],["tried","我试过了",c.tried]];
+  var stOpts=[["all","全部",c.all],["maybe_available","可能可用",c.maybe_available],["used","已使用",c.maybe_used+c.confirmed_used],["tried","我试过了",c.tried]];
   document.getElementById("statusFilters").innerHTML='<span class="group-label">状态</span>'+stOpts.map(function(o){
     return '<button type="button" class="pillbtn" data-status="'+esc(o[0])+'" aria-pressed="'+(statusFilter===o[0])+'">'+esc(o[1])+' '+o[2]+'</button>';
   }).join("");
@@ -499,7 +520,7 @@ function render(){
   updateFilterCount();
   var c=counts();
   document.getElementById("lastUpdated").textContent=lastUpdatedText||"—";
-  document.getElementById("summary").textContent=c.all+" 个码，其中可能可用 "+c.maybe_available+" 个 · 15 分钟内新码 "+c.fresh+" 个";
+  document.getElementById("summary").textContent=c.all+" 个码，其中可能可用 "+c.maybe_available+" 个 · 已使用 "+(c.maybe_used+c.confirmed_used)+" 个 · 15 分钟内新码 "+c.fresh+" 个";
   document.getElementById("wCount").textContent="可能可用 "+c.maybe_available+" 个 · 共 "+c.all+" 个码";
   document.getElementById("wTime").textContent="快照 "+(lastUpdatedText||"");
   var spot=nextAvailable(null);
@@ -536,10 +557,13 @@ function beep(){
     o.start();g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.35);o.stop(audioCtx.currentTime+0.36);
   }catch(e){}
 }
+var alertedCodes=lsGet("xiaodou-alerted-v1");
 function checkNewAvail(){
   var nowAvail={};
   allCodes.forEach(function(it){if(it.status==="maybe_available"&&it.check&&it.check.ok)nowAvail[it.code]=1;});
-  var freshNew=Object.keys(nowAvail).filter(function(k){return !knownAvail[k];});
+  var freshNew=Object.keys(nowAvail).filter(function(k){return !knownAvail[k]&&!alertedCodes[k];});
+  Object.keys(nowAvail).forEach(function(k){alertedCodes[k]=1;});
+  lsSet("xiaodou-alerted-v1",alertedCodes);
   if(Object.keys(knownAvail).length&&freshNew.length){
     var el=document.getElementById("newAlert");
     el.innerHTML="<span>发现新可用码：<strong>"+esc(freshNew.join("、"))+"</strong> —— 越快试越好。</span><button type='button' class='btn' id='alertCopy'>复制第一个</button>";
@@ -581,7 +605,7 @@ document.getElementById("platFilters").addEventListener("click",function(e){var 
 document.getElementById("statusFilters").addEventListener("click",function(e){var b=e.target.closest("button[data-status]");if(!b)return;statusFilter=b.getAttribute("data-status");render();});
 document.getElementById("list").addEventListener("click",function(e){
   var cb=e.target.closest("button[data-copy]");if(cb){copyCode(cb.getAttribute("data-copy"));return;}
-  var tb=e.target.closest("button[data-tried]");if(tb){var code=tb.getAttribute("data-tried");if(tried[code])delete tried[code];else tried[code]=1;render();}
+  var tb=e.target.closest("button[data-tried]");if(tb){var code=tb.getAttribute("data-tried");if(tried[code]){delete tried[code];}else{tried[code]=1;}lsSet("xiaodou-tried-v1",tried);render();}
 });
 document.getElementById("searchBox").addEventListener("input",render);
 document.getElementById("sortSel").addEventListener("change",render);
@@ -590,7 +614,7 @@ document.getElementById("availOnly").addEventListener("change",render);
 document.getElementById("spotCopy").addEventListener("click",function(){var s=nextAvailable(null);if(s)copyCode(s.code);});
 document.getElementById("nextBtn").addEventListener("click",function(){
   var cur=nextAvailable(null);if(!cur)return;
-  tried[cur.code]=1;
+  tried[cur.code]=1;lsSet("xiaodou-tried-v1",tried);
   var nxt=nextAvailable(null);
   if(nxt){copyCode(nxt.code);}else{render();}
 });
