@@ -271,7 +271,7 @@
 
   <section aria-label="邀请码列表">
     <h2 style="margin-top:8px">邀请码</h2>
-    <p class="hint">新码在上，15 分钟内发出的会标「实时新码」并排在最前。小豆邀请码必须是 6 位字母数字、且字母和数字都有，全字母、全数字、5 位、OPENAI / CLOUD 这类英文词本站直接不收录、不显示；3 个字母连在一起、或 3 个数字连在一起的也直接不收；含骂人谐音数字 91、78、13、27 的也直接不收；含 V50 这类型号词的也直接不收。已用怎么看：豆包没有官方核查接口，原站按原帖回复数推断——回复 0 是可能可用，有回复就是已使用。已使用的码只显示一次，下次更新就踢掉；重复出现的码不再当新码报。点「我试过了」会记在本机，下次更新也踢掉。</p>
+    <p class="hint">新码在上，15 分钟内发出的会标「实时新码」并排在最前。小豆邀请码必须是 6 位字母数字、且字母和数字都有，全字母、全数字、5 位、OPENAI / CLOUD 这类英文词本站直接不收录、不显示；3 个字母连在一起、或 3 个数字连在一起的也直接不收；外国品牌名（KFC 这类）、型号词（V50 这类）、协议梗、骂人话（2B、SB、91、78、13、27 这类）一律不收。已用怎么看：豆包没有官方核查接口，原站按原帖回复数推断——回复 0 是可能可用，有回复就是已使用。已使用的码只显示一次，下次更新就踢掉；重复出现的码不再当新码报。点「我试过了」会记在本机，下次更新也踢掉。</p>
 
     <div class="checkbar">
       <input type="text" id="checkInput" placeholder="粘贴一个码，先验格式再用" aria-label="手动检查邀请码格式" maxlength="24" autocomplete="off" spellcheck="false">
@@ -408,9 +408,11 @@ function isFresh(item){var m=ageMin(item);return m!==null&&m<=15;}
    全字母（如 OPENAI、CLOUD）、全数字、5 位等一律不算码，直接不显示。 */
 var BAD_WORDS=["OPENAI","CLOUD","DOUBAO","XIAODOU","CHATGPT","CLAUDE","GEMINI","GOOGLE","NVIDIA","AMAZON","MICROSOFT","ALIBABA","TENCENT","BYTEDANCE","COPILOT","DEEPSEEK","KIMIAI","QWENAI","DOUYIN","WECHAT","BAIDU","ABC123","123ABC","QWERTY","ASDFGH","ZXCVBN","AAAAAA","111111","000000","123456","ABCDEF"]; /* 品牌词 / 常见英文词 / 占位码：直接不收 */
 var BAD_STEMS=["OPENAI","GOOGLE","NVIDIA","DOUBAO","XIAODOU","CHATGPT","CLAUDE","GEMINI","CLOUD","OPEN","GOOG","NVDA","TESLA","APPLE","META"];
+/* 外国品牌名 + 协议梗：码里出现就踢，哥哥 2026-11-27 定（KFC、V50、2B、SB 这类） */
+var BAD_BRANDS=["KFC","MCD","MCDONALD","BURGER","STARBUCKS","SBUX","COKE","COCA","PEPSI","NIKE","ADIDAS","PUMA","REEBOK","SAMSUNG","SONY","INTEL","AMD","MICROSOFT","MSFT","AMAZON","AMZN","FACEBOOK","FB","INSTAGRAM","INSTA","YOUTUBE","YT","NETFLIX","DISNEY","TWITTER","TIKTOK","SHEIN","TEMU","BMW","BENZ","AUDI","TOYOTA","HONDA","NISSAN","MAZDA","HYUNDAI","KIA","VOLVO","PORSCHE","FERRARI","GUCCI","CHANEL","DIOR","ROLEX","LEGO","IKEA","ZARA","UNIQLO","VIVO","OPPO","XIAOMI","HUAWEI","HONOR","ONEPLUS","REALME","IQOO","REDMI","BAIDU","TENCENT","ALIBABA","TAOBAO","JD","PDD","MEITUAN","BILIBILI","ZHIHU","WEIBO","KUAISHOU","WECHAT","ALIPAY","DOUYIN","DIDI","LG","HP","DELL","LENOVO","ASUS","ACER","MSI","RAZER","LOGITECH","JBL","BOSE","PHILIPS","SIEMENS","NOKIA","MOTOROLA","VISA","MASTERCARD","PAYPAL","EBAY","WALMART","COSTCO","TARGET","SUBWAY","DOMINOS","PIZZA","HUT","BK","VW","UPS","DHL","FEDEX","HTTP","HTTPS","TCP","UDP","DNS","VPN","API","SDK","URL","WWW","FTP","SSH","SSL","TLS","GPU","CPU","WIFI","5G","4G","3G","NFT","BTC","ETH","USDT","DOGE","SOL","WEB3","DEFI","DAO","LLM","AGI","AIGC","GPT","IP","MAC","USB","HDMI","LAN","WAN","YYDS","XSWL","GKD","U1S1","404","502","666","520","1314","233","996","007"];
 var BAD_NUMBER_PAIRS=["91","78","13","27"]; /* 骂人谐音数字：91、78、13、27，含其中任意一对就踢 */
 var BAD_SEQUENCES=["2778","V50"]; /* 2778 = “爱吃几把”的谐音，哥哥 2026-11-24 纠正的；V50 = 型号词，哥哥 2026-11-27 让踢掉，单独再禁一遍 */
-var BAD_INSULTS=["JB","SB","CNM","NMSL","TMD"];
+var BAD_INSULTS=["JB","SB","CNM","NMSL","TMD","2B"]; /* 骂人缩写：JB、SB、2B（二逼）等，哥哥 2026-11-27 让踢掉 */
 function validateCode(raw){
   var code=String(raw==null?"":raw).trim().toUpperCase();
   if(!code)return {ok:false,code:code,reason:"空的，没有内容"};
@@ -431,6 +433,7 @@ function validateCode(raw){
   var lettersOnly=code.replace(/[0-9]/g,"");
   if(BAD_WORDS.indexOf(lettersOnly)!==-1)return {ok:false,code:code,reason:"去掉数字后是品牌词 / 英文词，不是邀请码"};
   for(var i=0;i<BAD_STEMS.length;i++){if(code.indexOf(BAD_STEMS[i])!==-1)return {ok:false,code:code,reason:"含有品牌词 "+BAD_STEMS[i]+"，不是邀请码"};}
+  for(var b=0;b<BAD_BRANDS.length;b++){if(code.indexOf(BAD_BRANDS[b])!==-1)return {ok:false,code:code,reason:"含外国品牌名 / 协议梗 "+BAD_BRANDS[b]+"，不是邀请码"};}
   for(var j=0;j<BAD_NUMBER_PAIRS.length;j++){if(code.indexOf(BAD_NUMBER_PAIRS[j])!==-1)return {ok:false,code:code,reason:"含骂人谐音数字 "+BAD_NUMBER_PAIRS[j]};}
   if(code.indexOf("2778")!==-1)return {ok:false,code:code,reason:"含 2778（爱吃几把的谐音）"};
   if(code.indexOf("V50")!==-1)return {ok:false,code:code,reason:"含 V50（型号词，不是邀请码）"};
