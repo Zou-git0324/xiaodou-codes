@@ -66,6 +66,9 @@
   .meta dd{margin:3px 0 0;font-weight:800;font-size:.98rem;line-height:1.45}
   .meta dd small{font-weight:500;color:var(--muted);font-size:.82rem;display:block}
   @media (max-width:760px){.meta{grid-template-columns:1fr 1fr}.meta>div:nth-child(3){border-left:0}.meta>div{border-top:1px solid var(--line)}.meta>div:nth-child(-n+2){border-top:0}}
+  /* 顶部功能条：小字，不喧宾夺主 */
+  .topstrip{font-size:12px;line-height:1.5;text-align:center;color:#166534;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:999px;padding:5px 12px;margin:10px 0 0;font-weight:700;white-space:nowrap;overflow-x:auto}
+  .topstrip b{color:#ea580c}
   /* spotlight */
   .spotlight{background:var(--hero);color:var(--hero-ink);border-radius:20px;padding:22px;margin:14px 0;box-shadow:var(--shadow-lg);display:flex;flex-wrap:wrap;gap:18px;align-items:center;justify-content:space-between;position:relative;overflow:hidden}
   .spotlight::before{content:"";position:absolute;inset:0;background:radial-gradient(420px 180px at 18% 0%,rgba(134,239,172,.18),transparent 65%);pointer-events:none}
@@ -227,6 +230,7 @@
 </section>
 
 <main id="app">
+  <div class="topstrip">⚡ <b>全网最快抓码</b> · 20 秒一刷 · <b>双源合流</b> · 假码秒踢 · <b>新码一到立刻提醒</b> · 点一下码就到手</div>
   <header class="hero">
     <div class="hero-top"><span class="live-pill"><span class="dot"></span>实时巡检中 · 20 秒刷新</span><span class="hero-note">X · 微博 · 小红书 · 抖音 · LINUX DO · 微信</span></div>
     <h1>小豆邀请码抓码站</h1>
@@ -244,7 +248,7 @@
 
   <dl class="meta">
     <div><dt>最后更新（数据源）</dt><dd id="lastUpdated">2026-11-24 19:02 北京时间</dd></div>
-    <div><dt>巡检 · 本页刷新</dt><dd>原站数据约每 5 分钟写入<br><small>本页每 20 秒自动拉取一次（原站是 60 秒）</small></dd></div>
+    <div><dt>巡检 · 本页刷新</dt><dd>双源数据约每 5 分钟写入<br><small>本页每 20 秒自动拉取一次（原站是 60 秒）</small></dd></div>
     <div><dt>下次刷新</dt><dd><span id="countdown">20</span> 秒 <button type="button" class="btn quiet" id="refreshNow" style="min-height:36px;padding:4px 10px;margin-left:6px">立即刷新</button></dd></div>
     <div><dt>当前收录</dt><dd id="summary">6 个码，其中可能可用 2 个</dd></div>
   </dl>
@@ -260,6 +264,7 @@
     </div>
     <div class="spot-actions">
       <button type="button" class="btn big" id="spotCopy">复制这个码</button>
+      <button type="button" class="btn big quiet" id="spotClaim">一键领码</button>
       <button type="button" class="btn big quiet" id="nextBtn">试过了 → 换下一个可用码</button>
     </div>
   </div>
@@ -291,13 +296,14 @@
           <label><input type="checkbox" id="freshOnly"> 只看 15 分钟内的实时码</label>
           <label><input type="checkbox" id="availOnly"> 只看可能可用</label>
           <label><input type="checkbox" id="soundOn"> 有新可用码时响一声</label>
+          <label><input type="checkbox" id="notifyOn"> 新码推送到手机（锁屏也提醒）</label>
           <label><input type="checkbox" id="autoOn" checked> 自动刷新</label>
         </div>
       </div>
     </div>
 
     <div class="list" id="list"></div>
-    <p class="hint" style="margin-top:10px">一码只能用一次。复制后请尽快在小豆 App 里使用；不能用就在该码上点「我试过了」，再点上方「换下一个可用码」接着试。</p>
+    <p class="hint" style="margin-top:10px">一码只能用一次。复制后请尽快在小豆 App 里使用；不能用就在该码上点「我试过了」，再点上方「换下一个可用码」接着试。点「一键领码」会复制码并打开小豆官网，你去 App 里粘贴就行。</p>
   </section>
 
   <div class="callout">
@@ -322,6 +328,7 @@
     <h2>其他渠道</h2>
     <div class="channels">
       <a class="channel" href="https://good1uck.github.io/xiaodou-codes/" target="_blank" rel="noopener">原站 · 小豆邀请码抓码站（只收 X）<small>good1uck.github.io · 本站的 X 数据就来自它的公开数据文件</small></a>
+      <a class="channel" href="https://paipiange.github.io/xiaodou-codes/" target="_blank" rel="noopener">派派 · 小豆邀请码抓码站（社区收集）<small>paipiange.github.io · 本站第二数据源，双源合流</small></a>
       <a class="channel" href="https://betteropc.com/ai-products/invite-codes/xiaodou" target="_blank" rel="noopener">BetterOPC 小豆邀请码共享页<small>betteropc.com · 码会很快被领走，建议开着页面多刷新</small></a>
       <a class="channel" href="https://m.weibo.cn/detail/5368723595591761" target="_blank" rel="noopener">豆包官方微博帖<small>微博 · 本站收录的 Q3F82N、S23JFN、ZFGCSX 三个码出自这条帖子</small></a>
       <a class="channel" href="https://linux.do/t/topic/3232250?page=2" target="_blank" rel="noopener">LINUX DO 小豆邀请码分享帖<small>linux.do · 本站收录的 SQ9WPU 出自这条帖子</small></a>
@@ -345,18 +352,21 @@
   </section>
 
   <footer>
-    本站数据来自公开帖子的社区整理：X 部分实时拉取原站公开数据文件，微博与 LINUX DO 部分为人工核对后补入的快照（补入于 2026-11-24）。与豆包、字节跳动无关。
+    本站数据来自公开帖子的社区整理：实时拉取原站与派派两个公开数据文件并合流去重，微博与 LINUX DO 部分为人工核对后补入的快照（补入于 2026-11-24）。与豆包、字节跳动无关。
   </footer>
 </main>
 
 <script>
-var DATA_URL = "https://good1uck.github.io/xiaodou-codes/codes.json";
+var DATA_URLS=[
+  {name:"原站",url:"https://good1uck.github.io/xiaodou-codes/codes.json"},
+  {name:"派派",url:"https://paipiange.github.io/xiaodou-codes/codes.json"}
+];
 var STATUS_LABEL = {maybe_available:"可能可用", maybe_used:"已使用", confirmed_used:"已使用"};
 var STATUS_CLASS = {maybe_available:"ok", maybe_used:"bad", confirmed_used:"bad"};
 /* 已用怎么看：豆包没有官方核查接口，原站是按原帖回复数推断的——回复 0 = 可能可用，回复 >0 = 已使用，人工核对过的 = 已使用。
    所以“已使用”是推断，不是 100% 准。显示一次后，下次更新就踢掉。 */
 function isUsedItem(it){return it.status!=="maybe_available"||(it.replyCount!=null&&it.replyCount>0);}
-var PLATFORMS = ["all","X","微博","小红书","抖音","LINUX DO","微信","其他"];
+var PLATFORMS = ["all","X","微博","小红书","抖音","LINUX DO","微信","官方邀请页","其他"];
 
 /* 人工补入的多平台码（原站没有）：状态均为已确认被用 */
 var EXTRA_CODES = [
@@ -433,7 +443,7 @@ function mergeCodes(xCodes){
     if(!code)return;
     if(seen[code])return; /* 同一次数据里重复的码，只留第一次出现的那条，不重复加入 */
     seen[code]=1;
-    var item={code:code,platform:platform||"X",author:c.author,postUrl:c.postUrl,postedAt:c.postedAt,postedAtUtc:c.postedAtUtc,replyCount:c.replyCount,status:c.status,expires:c.expires,officialUrl:c.officialUrl};
+    var item={code:code,platform:platform||"X",src:c._srcName||"原站",author:c.author,postUrl:c.postUrl,postedAt:c.postedAt,postedAtUtc:c.postedAtUtc,replyCount:c.replyCount,status:c.status,expires:c.expires,officialUrl:c.officialUrl};
     item.check=validateCode(item.code);
     if(!item.check.ok)return; /* 格式不合的直接不编入网站、不显示 */
     if(tried[code])return; /* 点过“我试过了”的，下次更新直接踢掉 */
@@ -447,7 +457,7 @@ function mergeCodes(xCodes){
     }
     out.push(item);
   }
-  (xCodes||[]).forEach(function(c){add(c,"X");});
+  (xCodes||[]).forEach(function(c){add(c,c.platform||"X");});
   EXTRA_CODES.forEach(function(c){add(c,c.platform);});
   lsSet("xiaodou-seen-v1",seenCodes);
   return out;
@@ -531,7 +541,8 @@ function render(){
   updateFilterCount();
   var c=counts();
   document.getElementById("lastUpdated").textContent=lastUpdatedText||"—";
-  document.getElementById("summary").textContent=c.all+" 个码，其中可能可用 "+c.maybe_available+" 个 · 已使用 "+(c.maybe_used+c.confirmed_used)+" 个 · 15 分钟内新码 "+c.fresh+" 个";
+  var s1=allCodes.filter(function(x){return x.src==="原站";}).length,s2=allCodes.filter(function(x){return x.src==="派派";}).length;
+  document.getElementById("summary").textContent=c.all+" 个码，其中可能可用 "+c.maybe_available+" 个 · 已使用 "+(c.maybe_used+c.confirmed_used)+" 个 · 15 分钟内新码 "+c.fresh+" 个 · 双源：原站 "+s1+" · 派派 "+s2;
   document.getElementById("wCount").textContent="可能可用 "+c.maybe_available+" 个 · 共 "+c.all+" 个码";
   document.getElementById("wTime").textContent="快照 "+(lastUpdatedText||"");
   var spot=nextAvailable(null);
@@ -554,8 +565,8 @@ function render(){
       +(fresh?'<span class="badge freshb">实时新码</span>':"")
       +'<span class="badge plat">'+esc(it.platform)+'</span>'+statusHtml
       +(it.expires?'<span class="expires">有效至 '+esc(it.expires)+'</span>':"")
-      +'</div><div class="sub"><span>'+esc(it.postedAt)+(age?' · '+esc(age):"")+'</span><span>来源：<a href="'+safeUrl(it.postUrl)+'" target="_blank" rel="noopener">'+(it.platform==="X"?"@":"")+esc(it.author)+'</a>'+official+'</span><span>平台：'+esc(it.platform)+replies+'</span>'+(valid?"":'<span class="checkfail">格式检查未通过：'+esc(it.check.reason)+'</span>')+'</div></div>'
-      +'<div class="card-actions"><button type="button" class="btn" data-copy="'+esc(it.code)+'">'+(copiedCode===it.code?"已复制 ✓":"复制")+'</button>'
+      +'</div><div class="sub"><span>'+esc(it.postedAt)+(age?' · '+esc(age):"")+'</span><span>来源：<a href="'+safeUrl(it.postUrl)+'" target="_blank" rel="noopener">'+(it.platform==="X"?"@":"")+esc(it.author)+'</a>'+official+'</span><span>平台：'+esc(it.platform)+replies+'</span><span>数据源：'+esc(it.src||"原站")+'</span>'+(valid?"":'<span class="checkfail">格式检查未通过：'+esc(it.check.reason)+'</span>')+'</div></div>'
+      +'<div class="card-actions"><button type="button" class="btn" data-claim="'+esc(it.code)+'">一键领码</button><button type="button" class="btn quiet" data-copy="'+esc(it.code)+'">'+(copiedCode===it.code?"已复制 ✓":"复制")+'</button>'
       +'<button type="button" class="btn quiet" data-tried="'+esc(it.code)+'">'+(isT?"取消标记":"我试过了")+'</button></div></article>';
   }).join("");
 }
@@ -582,6 +593,7 @@ function checkNewAvail(){
     var b=document.getElementById("alertCopy");
     if(b)b.addEventListener("click",function(){copyCode(freshNew[0]);});
     if(document.getElementById("soundOn").checked)beep();
+    if(document.getElementById("notifyOn").checked&&"Notification" in window&&Notification.permission==="granted"){try{new Notification("小豆新码："+freshNew[0],{body:"共 "+freshNew.length+" 个新可用码，越快试越好 · 点开本站查看",tag:"xiaodou-new-code"});}catch(e){}}
     setTimeout(function(){el.className="";},30000);
   }
   knownAvail=nowAvail;
@@ -593,11 +605,29 @@ function copyCode(code){
   function fallback(){var ta=document.createElement("textarea");ta.value=code;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");}catch(e){}document.body.removeChild(ta);done();}
 }
 function loadData(){
-  return fetch(DATA_URL+"?t="+Date.now(),{cache:"no-store"}).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json();}).then(function(j){
-    lastUpdatedText=j.lastUpdated||lastUpdatedText;
-    allCodes=mergeCodes(j.codes||[]);
+  return Promise.all(DATA_URLS.map(function(s){
+    return fetch(s.url+"?t="+Date.now(),{cache:"no-store"}).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json();}).then(function(j){return {src:s.name,j:j};}).catch(function(){return null;});
+  })).then(function(results){
+    var merged=[], latest="";
+    results.forEach(function(r){
+      if(!r||!r.j)return;
+      if(r.j.lastUpdated&&r.j.lastUpdated>latest)latest=r.j.lastUpdated;
+      (r.j.codes||[]).forEach(function(c){c._srcName=r.src;if(!c.platform)c.platform=(r.src==="派派"?"官方邀请页":"X");merged.push(c);});
+    });
+    if(!merged.length)throw new Error("双源都拉不到");
+    if(latest)lastUpdatedText=latest;
+    allCodes=mergeCodes(merged);
     checkNewAvail(); render();
   });
+}
+/* 一键领码：复制码 + 打开小豆官网，哥哥自己去 App 里粘贴（本站没有代填接口，不能代填） */
+function claimCode(code){
+  window.open("https://www.doubao.com/xiaodou/","_blank");
+  copyCode(code);
+  var el=document.getElementById("newAlert");
+  el.innerHTML="<span>码 <strong>"+esc(code)+"</strong> 已复制，小豆官网已打开，去 App 里粘贴使用（本站不能代填，得你自己粘贴）。</span>";
+  el.className="show";
+  setTimeout(function(){el.className="";},8000);
 }
 /* init with snapshot so page is never empty */
 allCodes=mergeCodes(SNAPSHOT.codes);
@@ -615,6 +645,7 @@ document.getElementById("filterToggle").addEventListener("click",function(){
 document.getElementById("platFilters").addEventListener("click",function(e){var b=e.target.closest("button[data-plat]");if(!b)return;platFilter=b.getAttribute("data-plat");render();});
 document.getElementById("statusFilters").addEventListener("click",function(e){var b=e.target.closest("button[data-status]");if(!b)return;statusFilter=b.getAttribute("data-status");render();});
 document.getElementById("list").addEventListener("click",function(e){
+  var cl=e.target.closest("button[data-claim]");if(cl){claimCode(cl.getAttribute("data-claim"));return;}
   var cb=e.target.closest("button[data-copy]");if(cb){copyCode(cb.getAttribute("data-copy"));return;}
   var tb=e.target.closest("button[data-tried]");if(tb){var code=tb.getAttribute("data-tried");if(tried[code]){delete tried[code];}else{tried[code]=1;}lsSet("xiaodou-tried-v1",tried);render();}
 });
@@ -623,6 +654,10 @@ document.getElementById("sortSel").addEventListener("change",render);
 document.getElementById("freshOnly").addEventListener("change",render);
 document.getElementById("availOnly").addEventListener("change",render);
 document.getElementById("spotCopy").addEventListener("click",function(){var s=nextAvailable(null);if(s)copyCode(s.code);});
+document.getElementById("spotClaim").addEventListener("click",function(){var s=nextAvailable(null);if(s)claimCode(s.code);});
+/* 新码手机提醒：勾选后向浏览器要通知权限，锁屏也能收到；拒绝就自动取消勾选 */
+(function(){var n=document.getElementById("notifyOn");if(!n)return;try{if(JSON.parse(localStorage.getItem("xiaodou-notify-v1")||"{}").on===1&&"Notification" in window&&Notification.permission==="granted")n.checked=true;}catch(e){}
+n.addEventListener("change",function(){if(!this.checked){try{localStorage.setItem("xiaodou-notify-v1",JSON.stringify({on:0}));}catch(e){}return;}if(!("Notification" in window)){this.checked=false;return;}var self=this;Notification.requestPermission().then(function(p){try{localStorage.setItem("xiaodou-notify-v1",JSON.stringify({on:p==="granted"?1:0}));}catch(e){}if(p!=="granted")self.checked=false;});});})();
 document.getElementById("nextBtn").addEventListener("click",function(){
   var cur=nextAvailable(null);if(!cur)return;
   tried[cur.code]=1;lsSet("xiaodou-tried-v1",tried);
